@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Octet / OneVision org-wide shared Renovate preset. Extend via: \"extends\": [\"github>Onevision-io/renovate-config\"]",
+  "extends": ["config:recommended"],
+  "rebaseWhen": "behind-base-branch",
+  "packageRules": [
+    {
+      "description": "Never auto-open major bumps org-wide (open manually / review).",
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
+  "hostRules": [
+    {
+      "description": "Auth for private @octetsolutions/* packages on GitHub Packages so Renovate can regenerate lockfiles (fixes 'renovate/artifacts: Artifact file update failure'). Token MUST be Mend-encrypted — see README, this is the only manual step.",
+      "matchHost": "npm.pkg.github.com",
+      "hostType": "npm",
+      "encrypted": {
+        "token": "PASTE_MEND_ENCRYPTED_TOKEN_HERE"
+      }
+    }
+  ]
+}
