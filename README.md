@@ -21,3 +21,20 @@ The hosted Mend Renovate app cannot read GitHub Actions secrets; the token must 
 3. Copy the encrypted string and replace `PASTE_MEND_ENCRYPTED_TOKEN_HERE` in `default.json` → `hostRules[0].encrypted.token`. Commit.
 
 Until step 3 is done, lockfile regeneration for private-package bumps will still fail; `rebaseWhen` and major-disabled work immediately.
+
+## Reusable workflow: lockfile-only fast-path
+
+Short-circuits CI to a 30-60s smoke when the ONLY changed files are lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `pubspec.lock`, `composer.lock`, `Cargo.lock`). Runs `npm/pnpm/yarn ci --prefer-offline` and `tsc --noEmit` if a tsconfig is present. Otherwise emits `heavy_needed=true` so the caller runs full CI.
+
+Opt-in from any repo's CI:
+```yaml
+jobs:
+  fast-path:
+    uses: Onevision-io/renovate-config/.github/workflows/lockfile-fast-path.yml@main
+  full-ci:
+    needs: fast-path
+    if: needs.fast-path.outputs.heavy_needed == 'true'
+    # ...normal jobs here
+```
+
+Council 2026-08-05: top-3 pipeline speed win (a) — lockfile-only fast-path. Target: PR-open → live-on-staging < 5 min for the common minor/patch dep bump.

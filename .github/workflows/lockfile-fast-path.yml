@@ -1,0 +1,107 @@
+# Reusable workflow: lockfile-only fast-path for dep-bump PRs.
+#
+# Called from consumer repos via:
+#   jobs:
+#     fast-path:
+#       uses: Onevision-io/renovate-config/.github/workflows/lockfile-fast-path.yml@main
+#
+# Behavior:
+#   - Inspects the PR's changed files via `gh api /repos/{owner}/{repo}/pulls/{n}/files`.
+#   - If EVERY changed file matches a known lockfile pattern → runs a 30-60s smoke
+#     (npm/pnpm/yarn ci --prefer-offline, plus `tsc --noEmit` if tsconfig exists) and exits 0.
+#   - Otherwise → sets output `heavy_needed=true` so the caller can run the full CI.
+#
+# Council 2026-08-05: top-3 pipeline speed win (a).
+
+name: lockfile-fast-path
+
+on:
+  workflow_call:
+    outputs:
+      heavy_needed:
+        description: "true if changes go beyond lockfiles and the caller must run full CI"
+        value: ${{ jobs.detect.outputs.heavy_needed }}
+      fast_path_ran:
+        description: "true if the fast-path smoke ran to completion"
+        value: ${{ jobs.detect.outputs.fast_path_ran }}
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      heavy_needed: ${{ steps.classify.outputs.heavy_needed }}
+      fast_path_ran: ${{ steps.smoke.outputs.ran }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Classify changed files
+        id: classify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PR_NUMBER:-}" ]; then
+            echo "Not a pull_request context — assuming heavy CI needed."
+            echo "heavy_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          files=$(gh api --paginate "/repos/${REPO}/pulls/${PR_NUMBER}/files" --jq '.[].filename')
+          if [ -z "$files" ]; then
+            echo "No changed files reported — assuming heavy CI needed."
+            echo "heavy_needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Changed files:"
+          echo "$files"
+          lockfile_re='(^|/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|pubspec\.lock|composer\.lock|Cargo\.lock)$'
+          non_lock=$(echo "$files" | grep -Ev "$lockfile_re" || true)
+          if [ -n "$non_lock" ]; then
+            echo "Non-lockfile changes detected:"
+            echo "$non_lock"
+            echo "heavy_needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Lockfile-only change → fast-path eligible."
+            echo "heavy_needed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Smoke — install + typecheck (fast-path only)
+        id: smoke
+        if: steps.classify.outputs.heavy_needed == 'false'
+        run: |
+          set -euo pipefail
+          echo "ran=false" >> "$GITHUB_OUTPUT"
+
+          if [ -f pnpm-lock.yaml ]; then
+            echo "Using pnpm"
+            corepack enable
+            corepack prepare pnpm@latest --activate
+            pnpm install --frozen-lockfile --prefer-offline
+          elif [ -f yarn.lock ]; then
+            echo "Using yarn"
+            corepack enable
+            yarn install --immutable || yarn install --frozen-lockfile
+          elif [ -f package-lock.json ]; then
+            echo "Using npm"
+            npm ci --prefer-offline --no-audit --no-fund
+          else
+            echo "No JS lockfile found — skipping install step (non-JS lockfile bump)."
+          fi
+
+          if [ -f tsconfig.json ] && [ -f package.json ]; then
+            if [ -x node_modules/.bin/tsc ]; then
+              echo "Running tsc --noEmit"
+              node_modules/.bin/tsc --noEmit
+            else
+              echo "tsc not installed — skipping typecheck"
+            fi
+          fi
+          echo "ran=true" >> "$GITHUB_OUTPUT"
