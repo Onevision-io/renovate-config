@@ -23,12 +23,10 @@
   "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
   "hostRules": [
     {
-      "description": "Auth for private @octetsolutions/* packages on GitHub Packages so Renovate can regenerate lockfiles (fixes 'renovate/artifacts: Artifact file update failure'). Token MUST be Mend-encrypted — see README, this is the only manual step.",
+      "description": "Auth for private @octetsolutions/* packages on GitHub Packages so Renovate can regenerate lockfiles. Token is a Mend Developer Portal secret named OCTETSOLUTIONS_NPM_TOKEN (org-scope). Migrated 2026-08-05 from embedded encrypted{} because Mend deprecated in-config encrypted secrets.",
       "matchHost": "npm.pkg.github.com",
       "hostType": "npm",
-      "encrypted": {
-        "token": "wcFMA/xDdHCJBTolAQ/7BoXJT+p9janmBPodh3H2kP5Dm21O0m3y7Cl52fKkxBLgHy0ic8geCJgBOyLCTKWjjtmvb9TGaUJUTb/WXa+lWW5dtlbglvWsflS8MDde6h6oPKzRd6Y2Tg0MfI6yZ4UKbHPwW+Rjix5E0FHytShyITKCs1P2us9ZlE7KfqPjoHDt+J56VYe8odnLoIPYdFa/3k8K/3VTRIdzrk5KmQDWpDoyMV1/hdV11gRXkWnvgIJ96DpB/xELFwBTcVzJGjqjECnAENRkKa/p8g9q7zvEN9uM7wqjpgMSzSQOtyGX8HiLE5PJJb0dInxPUluwv1cFoUbsWkR+Da15HfQfJWewndvkSoNughl/fhqv5+lTziDDjp8WdMJkfOzrqxhn7fHfWLEwrXmlWs/CVLWXKEwj66IuHhiRJoDruyldsp3XVyRWnSiDwDrO/0ivy48gCwjDhq86Sgboq+yquiMYRx1ZQkhzVw2UY1XJDqSsdNbD5FzG5qFRvhB9bISai+ZbSA+d0dAypWazulV/2IDGJBvAbSRTHn55OQPDGLgSLXWEwh66nbIqKSlNxr/zpa1WNgD/+FQJYip4/004IcOFAWlhvFVGuMglieGxtWX9MRRyL2nFPEoXFWhaavisHwrh23z90RKssnHVnyllhp+9Ba0ANJ99UoQ7nQDJREuGcCs/HiDSdAEU5XPshM6OUGxJk1USaSZbEJR/HFhLx/YoXqyLVBeX/0Vkq5EdjRu3O+kohLv3keSFSEFftuLGiQvF6DqXVHcrO0IEL90Apm25TSGHoqaBdl/B3/KmozsbpTrwgthOYoRKo4XLA772OfvUvLf57/cjG+q7=GqjO"
-      }
+      "token": "{{ secrets.OCTETSOLUTIONS_NPM_TOKEN }}"
     }
   ]
 }
