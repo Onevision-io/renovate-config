@@ -1,0 +1,34 @@
+# .github/workflows/pr-automerge.yml -- SHIM: DO NOT EDIT
+# Configuration goes in the `with:` block below.
+# Source: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1
+#
+# To customize per-repo: edit `required_checks` (JSON array of check names
+# that MUST be green) and `merge_method`. Everything else = reusable defaults.
+# To change WORKFLOW LOGIC: edit the source in Onevision-io/.github, tag a new
+# @vN, then bump the ref below. NEVER inline logic here.
+
+name: pr-automerge
+
+on:
+  check_suite:
+    types: [completed]
+  pull_request:
+    types: [labeled, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  actions: read
+
+jobs:
+  automerge:
+    uses: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1
+    with:
+      required_checks: '[]'
+      merge_method: squash
+      base_ci_workflow: ci.yml
+    # No `secrets:` block — reusable workflow uses GITHUB_TOKEN by default.
+    # To upgrade to an App identity: create an org secret AUTOMERGE_APP_TOKEN,
+    # then add `secrets: { AUTOMERGE_APP_TOKEN: ${{ secrets.AUTOMERGE_APP_TOKEN }} }`
+    # here. Do NOT use `secrets: inherit` — Kimi 2026-08-05 (leaks all caller secrets).
