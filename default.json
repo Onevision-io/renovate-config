@@ -3,11 +3,21 @@
   "description": "Octet / OneVision org-wide shared Renovate preset. Extend via: \"extends\": [\"github>Onevision-io/renovate-config\"]",
   "extends": ["config:recommended"],
   "rebaseWhen": "behind-base-branch",
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 5,
+  "minimumReleaseAge": "3 days",
   "packageRules": [
     {
       "description": "Never auto-open major bumps org-wide (open manually / review).",
       "matchUpdateTypes": ["major"],
       "enabled": false
+    },
+    {
+      "description": "devDependencies: skip stability wait and auto-merge on green (they don't ship to prod). Council 2026-08-05.",
+      "matchDepTypes": ["devDependencies"],
+      "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr"
     }
   ],
   "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
