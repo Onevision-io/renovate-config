@@ -6,6 +6,7 @@
   "prConcurrentLimit": 3,
   "prHourlyLimit": 5,
   "minimumReleaseAge": "3 days",
+  "platformAutomerge": true,
   "packageRules": [
     {
       "description": "Never auto-open major bumps org-wide (open manually / review).",
@@ -16,6 +17,12 @@
       "description": "devDependencies: skip stability wait and auto-merge on green (they don't ship to prod). Council 2026-08-05.",
       "matchDepTypes": ["devDependencies"],
       "minimumReleaseAge": "0 days",
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Regular deps: auto-merge patch updates on green CI (low-risk semver). 2026-08-06.",
+      "matchUpdateTypes": ["patch"],
       "automerge": true,
       "automergeType": "pr"
     }
