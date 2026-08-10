@@ -18,13 +18,15 @@
       "matchDepTypes": ["devDependencies"],
       "minimumReleaseAge": "0 days",
       "automerge": true,
-      "automergeType": "pr"
+      "automergeType": "pr",
+      "addLabels": ["auto-merge"]
     },
     {
       "description": "Regular deps: auto-merge patch updates on green CI (low-risk semver). 2026-08-06.",
       "matchUpdateTypes": ["patch"],
       "automerge": true,
-      "automergeType": "pr"
+      "automergeType": "pr",
+      "addLabels": ["auto-merge"]
     }
   ],
   "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
