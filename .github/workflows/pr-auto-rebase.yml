@@ -1,0 +1,22 @@
+name: pr-auto-rebase
+on:
+  schedule: [{cron: "*/30 * * * *"}]
+  workflow_dispatch: {}
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr list --repo "${{ github.repository }}" --state open --label auto-merge \
+            --json number,mergeStateStatus \
+            --jq ".[] | select(.mergeStateStatus==\"BEHIND\" or .mergeStateStatus==\"DIRTY\") | .number" \
+          | while read n; do
+              echo "::group::updating PR #$n"
+              gh pr update-branch "$n" --repo "${{ github.repository }}" 2>&1 || true
+              echo "::endgroup::"
+            done
