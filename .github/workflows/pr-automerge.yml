@@ -13,7 +13,14 @@ on:
   check_suite:
     types: [completed]
   pull_request:
-    types: [labeled, synchronize]
+    types: [opened, labeled, synchronize, reopened, ready_for_review]
+  # Re-fire when required CI workflows complete. check_suite is unreliable for
+  # Actions-generated suites on PR head branches; workflow_run fires from the
+  # DEFAULT-BRANCH copy so first-install falls back to check_suite/manual.
+  # Ref memory [[pr-automerge-one-shot-trigger-bug]], Lazzat PR #324.
+  workflow_run:
+    workflows: ["CI","gitleaks"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -23,6 +30,8 @@ permissions:
 
 jobs:
   automerge:
+    # workflow_run: only proceed on upstream success; other events run + inner filter.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     uses: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1
     with:
       required_checks: '[]'
