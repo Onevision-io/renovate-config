@@ -1,6 +1,11 @@
 name: pr-auto-rebase
+# Event-driven: a PR only goes BEHIND when its base branch advances, so react to that
+# instead of polling every 30 min. workflow_dispatch kept for manual break-glass.
 on:
-  schedule: [{cron: "*/30 * * * *"}]
+  push:
+    branches: [main, master]
+  pull_request:
+    types: [opened, reopened, synchronize]
   workflow_dispatch: {}
 permissions:
   contents: write
