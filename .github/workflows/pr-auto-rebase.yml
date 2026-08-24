@@ -10,8 +10,31 @@ on:
 permissions:
   contents: write
   pull-requests: write
+# Collapse bursts: the bone-marrow engine pushes to main every 1-2 min, and each
+# push was starting its own runner. Cancel the older still-queued rebase when a
+# newer push lands on the same ref. Housekeeping pushes never share the group
+# with real pushes (keyed to run_id) so they can't cancel a real rebase.
+concurrency:
+  group: >-
+    rebase-${{ github.ref }}-${{
+      (github.event_name == 'push' &&
+       (startsWith(github.event.head_commit.message, 'bone-marrow auto-sync') ||
+        startsWith(github.event.head_commit.message, 'kos-sync reconcile') ||
+        startsWith(github.event.head_commit.message, 'auto-settle')))
+      && github.run_id || 'main' }}
+  cancel-in-progress: true
 jobs:
   rebase:
+    # Skip pure housekeeping pushes. The engine commits to main every 1-2 min
+    # (bone-marrow auto-sync / kos-sync reconcile / auto-settle); rebasing every
+    # open PR on each micro-commit is pure churn — a runner spun up just to run
+    # `gh pr list` and usually find nothing BEHIND. Real merges, human pushes,
+    # PR events, and the pr-automerge cron sweep still cover the rebase need.
+    if: >-
+      github.event_name != 'push' ||
+      (!startsWith(github.event.head_commit.message, 'bone-marrow auto-sync') &&
+       !startsWith(github.event.head_commit.message, 'kos-sync reconcile') &&
+       !startsWith(github.event.head_commit.message, 'auto-settle'))
     runs-on: ubuntu-latest
     steps:
       - env:
