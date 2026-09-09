@@ -7,6 +7,7 @@
   "prHourlyLimit": 5,
   "minimumReleaseAge": "3 days",
   "platformAutomerge": true,
+  "postUpdateOptions": ["npmDedupe"],
   "packageRules": [
     {
       "description": "Never auto-open major bumps org-wide (open manually / review).",
@@ -14,9 +15,9 @@
       "enabled": false
     },
     {
-      "description": "devDependencies: skip stability wait and auto-merge on green (they don't ship to prod). Council 2026-08-05.",
+      "description": "devDependencies: auto-merge on green (they don't ship to prod), but wait 3 days to match-or-exceed pnpm repos' own supply-chain cool-off (efone-crm renovate.json sets minimumReleaseAge: 2 days; aligned here to the org-wide top-level 3 days so pnpm's own gate never rejects what Renovate proposed). Council 2026-08-05 fast-merge softened for pnpm-safety 2026-09-08.",
       "matchDepTypes": ["devDependencies"],
-      "minimumReleaseAge": "0 days",
+      "minimumReleaseAge": "3 days",
       "automerge": true,
       "automergeType": "pr",
       "addLabels": ["auto-merge"]
