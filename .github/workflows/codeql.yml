@@ -1,0 +1,49 @@
+# CodeQL — advanced setup (replaces per-push default setup; Actions-cost fix 2026-09-17)
+# B: PR scans skip docs/state-only changes · C: daily scan only if code changed in last 25h
+name: CodeQL
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**/*.md', '**/*.jsonl', 'docs/**', 'state/**', 'memory/**', '**/*.txt']
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  changed:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.c.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - id: c
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo run=true >> "$GITHUB_OUTPUT"; exit 0; fi
+          n=$(git log --since='25 hours ago' --format=%H -- . ':(exclude,glob)**/*.md' ':(exclude,glob)**/*.jsonl' ':(exclude)docs' ':(exclude)state' ':(exclude)memory' | wc -l)
+          echo "code commits in 25h: $n"; [ "$n" -gt 0 ] && echo run=true >> "$GITHUB_OUTPUT" || echo run=false >> "$GITHUB_OUTPUT"
+  analyze:
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    name: analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.language == 'go' && 'autobuild' || 'none' }}
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
