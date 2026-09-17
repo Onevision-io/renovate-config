@@ -1,6 +1,6 @@
 # .github/workflows/pr-automerge.yml -- SHIM: DO NOT EDIT
 # Configuration goes in the `with:` block below.
-# Source: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1
+# Source: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1.3
 #
 # To customize per-repo: edit `required_checks` (JSON array of check names
 # that MUST be green) and `merge_method`. Everything else = reusable defaults.
@@ -32,7 +32,7 @@ jobs:
   automerge:
     # workflow_run: only proceed on upstream success; other events run + inner filter.
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    uses: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1
+    uses: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1.3
     with:
       required_checks: '[]'
       merge_method: squash
