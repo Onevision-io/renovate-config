@@ -1,30 +1,43 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Octet / OneVision org-wide shared Renovate preset. Extend via: \"extends\": [\"github>Onevision-io/renovate-config\"]",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "rebaseWhen": "behind-base-branch",
   "prConcurrentLimit": 3,
   "prHourlyLimit": 5,
   "minimumReleaseAge": "3 days",
   "platformAutomerge": true,
-  "postUpdateOptions": ["npmDedupe"],
+  "postUpdateOptions": [
+    "npmDedupe"
+  ],
   "packageRules": [
     {
       "description": "Never auto-open major bumps org-wide (open manually / review).",
-      "matchUpdateTypes": ["major"],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "enabled": false
     },
     {
       "description": "devDependencies: auto-merge on green (they don't ship to prod), but wait 3 days to match-or-exceed pnpm repos' own supply-chain cool-off (efone-crm renovate.json sets minimumReleaseAge: 2 days; aligned here to the org-wide top-level 3 days so pnpm's own gate never rejects what Renovate proposed). Council 2026-08-05 fast-merge softened for pnpm-safety 2026-09-08.",
-      "matchDepTypes": ["devDependencies"],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
       "minimumReleaseAge": "3 days",
       "automerge": true,
       "automergeType": "pr",
-      "addLabels": ["auto-merge"]
+      "addLabels": [
+        "auto-merge"
+      ]
     },
     {
       "description": "Cross-org private git deps (Octetsolutions/core_auth, core_voip, new_octet-version) are UNLOOKUPABLE by the hosted Renovate App: Renovate authenticates with the installation token of the repo it is renovating (Onevision-io / eFone), and that token cannot read another org's private repos -- the Octetsolutions installation (147134544, repository_selection=all) is irrelevant to it. Result was a permanent 'Failed to look up git-refs package ... no-result' WARN on every Dependency Dashboard + a failing renovate/artifacts check. These pins are bumped by hand (e.g. onevision-app-v2 #354), so disable the lookup rather than leave a red check. To RE-ENABLE: add a Mend Developer Portal org secret holding a token with repo-read on Octetsolutions, add a hostRules entry {matchHost: github.com, hostType: git-refs, token: ...}, then delete this rule. 2026-09-17.",
-      "matchDatasources": ["git-refs", "git-tags"],
+      "matchDatasources": [
+        "git-refs",
+        "git-tags"
+      ],
       "matchPackageNames": [
         "https://github.com/Octetsolutions/**"
       ],
@@ -32,10 +45,25 @@
     },
     {
       "description": "Regular deps: auto-merge patch updates on green CI (low-risk semver). 2026-08-06.",
-      "matchUpdateTypes": ["patch"],
+      "matchUpdateTypes": [
+        "patch"
+      ],
       "automerge": true,
       "automergeType": "pr",
-      "addLabels": ["auto-merge"]
+      "addLabels": [
+        "auto-merge"
+      ]
+    },
+    {
+      "description": "Regular deps: label auto-merge on minor + digest + lockFileMaintenance updates too (fleet-wide PR-label convention, R-KOS-DEPLOY.must.23).",
+      "matchUpdateTypes": [
+        "minor",
+        "digest",
+        "lockFileMaintenance"
+      ],
+      "addLabels": [
+        "auto-merge"
+      ]
     }
   ],
   "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
