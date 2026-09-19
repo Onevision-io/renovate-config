@@ -19,7 +19,7 @@ on:
   # DEFAULT-BRANCH copy so first-install falls back to check_suite/manual.
   # Ref memory [[pr-automerge-one-shot-trigger-bug]], Lazzat PR #324.
   workflow_run:
-    workflows: ["CI","gitleaks"]
+    workflows: ["CI", "gitleaks"]
     types: [completed]
 
 permissions:
@@ -32,12 +32,15 @@ jobs:
   automerge:
     # workflow_run: only proceed on upstream success; other events run + inner filter.
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    uses: Onevision-io/.github/.github/workflows/pr-automerge.yml@v1.3
+    uses: Octet-Public/octet-workflows/.github/workflows/pr-automerge.yml@cbe6934164a90ab8104c0a96e4acb9c5061e0198  # v2.0.0
     with:
       required_checks: '[]'
       merge_method: squash
-      base_ci_workflow: ci.yml
+      base_ci_workflow: ''
     # No `secrets:` block — reusable workflow uses GITHUB_TOKEN by default.
     # To upgrade to an App identity: create an org secret AUTOMERGE_APP_TOKEN,
     # then add `secrets: { AUTOMERGE_APP_TOKEN: ${{ secrets.AUTOMERGE_APP_TOKEN }} }`
     # here. Do NOT use `secrets: inherit` — Kimi 2026-08-05 (leaks all caller secrets).
+    secrets:
+      AUTOMERGE_APP_ID: ${{ secrets.AUTOMERGE_APP_ID }}
+      AUTOMERGE_APP_PRIVATE_KEY: ${{ secrets.AUTOMERGE_APP_PRIVATE_KEY }}
