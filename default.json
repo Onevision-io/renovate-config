@@ -44,22 +44,6 @@
       "enabled": false
     },
     {
-      "description": "Cross-org private git deps (Octetsolutions/core_auth, core_voip, new_octet-version) are UNLOOKUPABLE by the hosted Renovate App: Renovate authenticates with the installation token of the repo it is renovating (Onevision-io / eFone), and that token cannot read another org's private repos -- the Octetsolutions installation (147134544, repository_selection=all) is irrelevant to it. Result was a permanent 'Failed to look up git-refs package ... no-result' WARN on every Dependency Dashboard + a failing renovate/artifacts check. These pins are bumped by hand (e.g. onevision-app-v2 #354), so disable the lookup rather than leave a red check. To RE-ENABLE: add a Mend Developer Portal org secret holding a token with repo-read on Octetsolutions, add a hostRules entry {matchHost: github.com, hostType: git-refs, token: ...}, then delete this rule. 2026-09-17.",
-      "matchDatasources": ["git-refs", "git-tags"],
-      "matchPackageNames": [
-        "https://github.com/Octetsolutions/**"
-      ],
-      "enabled": false
-    },
-    {
-      "description": "Cross-org private git deps (Octetsolutions/core_auth, core_voip, new_octet-version) are UNLOOKUPABLE by the hosted Renovate App: Renovate authenticates with the installation token of the repo it is renovating (Onevision-io / eFone), and that token cannot read another org's private repos -- the Octetsolutions installation (147134544, repository_selection=all) is irrelevant to it. Result was a permanent 'Failed to look up git-refs package ... no-result' WARN on every Dependency Dashboard + a failing renovate/artifacts check. These pins are bumped by hand (e.g. onevision-app-v2 #354), so disable the lookup rather than leave a red check. To RE-ENABLE: add a Mend Developer Portal org secret holding a token with repo-read on Octetsolutions, add a hostRules entry {matchHost: github.com, hostType: git-refs, token: ...}, then delete this rule. 2026-09-17.",
-      "matchDatasources": ["git-refs", "git-tags"],
-      "matchPackageNames": [
-        "https://github.com/Octetsolutions/**"
-      ],
-      "enabled": false
-    },
-    {
       "description": "Regular deps: auto-merge patch updates on green CI (low-risk semver). 2026-08-06.",
       "matchUpdateTypes": [
         "patch"
