@@ -1,0 +1,12 @@
+# gitleaks — secret-scanning gate. Canonical logic lives in the shared reusable workflow;
+# this file is a thin pinned caller. Check-run: `gitleaks / gitleaks`.
+name: gitleaks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  gitleaks:
+    uses: Octet-Public/octet-workflows/.github/workflows/gitleaks.yml@00bcf2dcd7fcf9b730348552a94734ee0403d631
