@@ -21,6 +21,9 @@ on:
   workflow_run:
     workflows: ["CI", "gitleaks"]
     types: [completed]
+  # manual kick so the fleet drainer can wake this sweeper (KOS fleet-drain)
+  workflow_dispatch:
+
 
 permissions:
   contents: write
