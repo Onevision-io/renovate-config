@@ -9,4 +9,4 @@ permissions:
   contents: read
 jobs:
   gitleaks:
-    uses: Octet-Public/octet-workflows/.github/workflows/gitleaks.yml@5de5fbb2ffc86374ee2ffdb2a2beb5c0b966af0c  # v2.6.4
+    uses: Octet-Public/octet-workflows/.github/workflows/gitleaks.yml@d7a0c4b0cec6e441ed10d89488487f8a368759b0  # v2.8.3
