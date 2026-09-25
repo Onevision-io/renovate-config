@@ -64,6 +64,25 @@
       "addLabels": [
         "auto-merge"
       ]
+    },
+    {
+      "description": "Octet-Public/octet-workflows reusable-workflow SHA pins: bump IMMEDIATELY (no 3-day cool-off -- it's our own infra, not a third-party supply-chain risk) and auto-merge on green so a fix landed on octet-workflows main (e.g. PR #140's health-gate deadlock fix) propagates to every consumer without manual pin edits. Grouped into one PR per repo. Added 2026-09-25 after #668/#669 needed a manual bump + rebase.",
+      "groupName": "octet-workflows pin",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepNames": [
+        "Octet-Public/octet-workflows"
+      ],
+      "minimumReleaseAge": "0 days",
+      "schedule": [
+        "at any time"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "addLabels": [
+        "auto-merge"
+      ]
     }
   ],
   "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
