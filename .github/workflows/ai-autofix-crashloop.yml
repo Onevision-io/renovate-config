@@ -14,4 +14,9 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
-    secrets: inherit
+    # Explicit secrets, not `secrets: inherit` (flagged by ai-review: over-broad org-secret
+    # exposure to a third-party reusable workflow). The callee only reads these two
+    # (Octet-Public/octet-workflows .github/workflows/ai-autofix-crashloop.yml lines 217-218).
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
