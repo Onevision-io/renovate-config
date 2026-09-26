@@ -1,0 +1,17 @@
+name: AI Autofix (crashloop)
+
+on:
+  repository_dispatch:
+    types: [tracker-error, autofix]
+
+permissions: {}
+
+jobs:
+  fix:
+    uses: Octet-Public/octet-workflows/.github/workflows/ai-autofix-crashloop.yml@09abef2db8f89f117444e3a8f5cd658536064393
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    secrets: inherit
