@@ -1,0 +1,25 @@
+name: CI Red -> Autofix Bridge
+
+on:
+  check_suite:
+    types: [completed]
+  status:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number to dry-run the bridge against"
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  bridge:
+    uses: Octet-Public/octet-workflows/.github/workflows/ci-red-autofix-bridge.yml@09abef2db8f89f117444e3a8f5cd658536064393
+    permissions:
+      contents: write
+      checks: read
+      pull-requests: read
+      actions: read
+    with:
+      pr: ${{ inputs.pr }}
