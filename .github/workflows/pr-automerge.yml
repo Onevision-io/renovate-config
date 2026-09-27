@@ -25,6 +25,9 @@ on:
   workflow_dispatch:
 
 
+concurrency:
+  group: pr-automerge-${{ github.event.pull_request.number || github.event.workflow_run.head_branch || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
   pull-requests: write
