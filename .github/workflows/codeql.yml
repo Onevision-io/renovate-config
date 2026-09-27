@@ -2,9 +2,10 @@
 # B: PR scans skip docs/state-only changes · C: daily scan only if code changed in last 25h
 name: CodeQL
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
-    paths-ignore: ['**/*.md', '**/*.jsonl', 'docs/**', 'state/**', 'memory/**', '**/*.txt']
   schedule:
     - cron: '23 6 * * *'
   workflow_dispatch: {}
@@ -25,6 +26,8 @@ jobs:
         with: { fetch-depth: 0 }
       - id: c
         run: |
+          # 2026-09-27 owner: selective CodeQL reverted (non-KOS orgs) — always analyse every PR/push/schedule
+          echo run=true >> "$GITHUB_OUTPUT"; echo scan=true >> "$GITHUB_OUTPUT"; exit 0
           if [ "${{ github.event_name }}" != "schedule" ]; then echo run=true >> "$GITHUB_OUTPUT"; exit 0; fi
           n=$(git log --since='25 hours ago' --format=%H -- . ':(exclude,glob)**/*.md' ':(exclude,glob)**/*.jsonl' ':(exclude)docs' ':(exclude)state' ':(exclude)memory' | wc -l)
           echo "code commits in 25h: $n"; [ "$n" -gt 0 ] && echo run=true >> "$GITHUB_OUTPUT" || echo run=false >> "$GITHUB_OUTPUT"
