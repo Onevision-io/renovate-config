@@ -1,0 +1,45 @@
+# .github/workflows/ai-review.yml -- SHIM: DO NOT EDIT
+# Logic lives in Octet-Public/octet-workflows; bump the SHA below in a PR to adopt a new version.
+#
+# WHY THIS REPO NEEDS IT: pr-automerge refuses to merge any PR touching .github/workflows/*
+# without a UNANIMOUS 2/2 ai-review PASS on the exact head SHA. Without this caller that
+# condition can never be met, so every workflow PR here needs a human merge forever.
+# pr-automerge detects the reviewer by this exact path (ai-review.yml) -- do not rename.
+#
+# TRUST MODEL: pull_request_target runs this file and the reusable from the DEFAULT BRANCH,
+# so a PR cannot edit its own reviewer. PR content is read via the API as data, never executed.
+# Seat keys + the reviewer App key are org secrets (or Environment `ai-reviewer` overrides),
+# entered only by the reusable's `review` job.
+#
+# ENGINE: org/repo vars win when set; the fallbacks are the fleet-canonical engine coordinates
+# (same pins as eFone/efone-v5-control), so the caller works in orgs with no AI_REVIEW_* vars.
+# Per-repo switch (reusable contract): verdict is produced only when AI_REVIEWER_APP_ID is set
+# AND repo var AI_REVIEWER_REPO_ENABLED == 'true'.
+name: ai-review
+
+on:
+  pull_request_target:  # zizmor: ignore[dangerous-triggers] required by design -- the reviewer must run from the default branch, not from the PR; PR code is never checked out or executed
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  ai-review:
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    uses: Octet-Public/octet-workflows/.github/workflows/ai-review.yml@d7a0c4b0cec6e441ed10d89488487f8a368759b0  # v2.8.3
+    with:
+      engine_repository: ${{ vars.AI_REVIEW_ENGINE_REPOSITORY || 'eFone/efone-v5-api-nestjs' }}
+      engine_ref: ${{ vars.AI_REVIEW_ENGINE_REF || '04d8d91d77e59232033a6d7e83ccc7a65d889c0b' }}
+      reviewer_bot_prefix: ${{ vars.AI_REVIEW_REVIEWER_BOT_PREFIX || 'efone-ai-reviewer' }}
+      review_title: Safety review
+    # inherit is the ONLY option: the reusable's review job reads the App key and seat keys
+    # directly (no workflow_call.secrets block), and environment-scoped secrets cannot be passed
+    # explicitly by a caller job. Omitting it fails the App-token mint and the engine BLOCKs.
+    secrets: inherit  # zizmor: ignore[secrets-inherit] environment-scoped secrets cannot be passed explicitly
