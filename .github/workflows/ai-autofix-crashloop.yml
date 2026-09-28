@@ -8,7 +8,7 @@ permissions: {}
 
 jobs:
   fix:
-    uses: Octet-Public/octet-workflows/.github/workflows/ai-autofix-crashloop.yml@09abef2db8f89f117444e3a8f5cd658536064393
+    uses: Octet-Public/octet-workflows/.github/workflows/ai-autofix-crashloop.yml@a60c14cb1281d616c27075443aa817b2f9224d00
     permissions:
       contents: write
       pull-requests: write
