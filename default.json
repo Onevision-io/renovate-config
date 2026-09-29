@@ -95,7 +95,7 @@
       ]
     }
   ],
-  "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\n",
+  "npmrc": "@octetsolutions:registry=https://npm.pkg.github.com/\nlegacy-peer-deps=true\n",
   "hostRules": [
     {
       "description": "Auth for private @octetsolutions/* packages on GitHub Packages so Renovate can regenerate lockfiles. Token is a Mend Developer Portal secret named OCTETSOLUTIONS_NPM_TOKEN (org-scope). Migrated 2026-08-05 from embedded encrypted{} because Mend deprecated in-config encrypted secrets.",
