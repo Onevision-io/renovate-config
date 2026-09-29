@@ -5,13 +5,33 @@
     "config:recommended"
   ],
   "rebaseWhen": "behind-base-branch",
-  "prConcurrentLimit": 3,
+  "timezone": "America/Toronto",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "prConcurrentLimit": 2,
   "prHourlyLimit": 5,
   "minimumReleaseAge": "3 days",
   "platformAutomerge": true,
   "postUpdateOptions": [
     "npmDedupe"
   ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": [
+      "at any time"
+    ],
+    "minimumReleaseAge": "0 days",
+    "matchUpdateTypes": [
+      "patch"
+    ],
+    "automerge": true,
+    "automergeType": "pr",
+    "labels": [
+      "security",
+      "auto-merge"
+    ]
+  },
   "packageRules": [
     {
       "description": "Never auto-open major bumps org-wide (open manually / review).",
@@ -44,9 +64,13 @@
       "enabled": false
     },
     {
-      "description": "Regular deps: auto-merge patch updates on green CI (low-risk semver). 2026-08-06.",
+      "description": "Renovate-only consolidation (owner decision 2026-09-28): group ALL non-major updates into ONE PR per repo, automerge patch+minor on green CI (platformAutomerge respects required checks -- never bypasses branch protection). digest/lockFileMaintenance ride the same group+label but aren't forced to automerge if not already covered by patch/minor semantics.",
+      "groupName": "all non-major dependencies",
       "matchUpdateTypes": [
-        "patch"
+        "patch",
+        "minor",
+        "digest",
+        "lockFileMaintenance"
       ],
       "automerge": true,
       "automergeType": "pr",
@@ -55,29 +79,15 @@
       ]
     },
     {
-      "description": "Regular deps: label auto-merge on minor + digest + lockFileMaintenance updates too (fleet-wide PR-label convention, R-KOS-DEPLOY.must.23).",
-      "matchUpdateTypes": [
-        "minor",
-        "digest",
-        "lockFileMaintenance"
-      ],
-      "addLabels": [
-        "auto-merge"
-      ]
-    },
-    {
-      "description": "Octet-Public/octet-workflows reusable-workflow SHA pins: bump IMMEDIATELY (no 3-day cool-off -- it's our own infra, not a third-party supply-chain risk) and auto-merge on green so a fix landed on octet-workflows main (e.g. PR #140's health-gate deadlock fix) propagates to every consumer without manual pin edits. Grouped into one PR per repo. Added 2026-09-25 after #668/#669 needed a manual bump + rebase.",
-      "groupName": "octet-workflows pin",
+      "description": "Owner decision 2026-09-28: @v2 tag refs dropped, all Octet-Public/* reusable workflows/actions stay SHA-pinned; Renovate bumps the pin. pinDigests keeps the trailing '# vX.Y.Z' comment automatically. Folded into the same weekly 'all non-major dependencies' group/PR (superseding the prior immediate/any-time rule added 2026-09-25) so it rides the normal Monday cadence and required-checks automerge like everything else -- never bypasses branch protection.",
+      "groupName": "all non-major dependencies",
       "matchManagers": [
         "github-actions"
       ],
-      "matchDepNames": [
-        "Octet-Public/octet-workflows"
+      "matchDepPatterns": [
+        "^Octet-Public/"
       ],
-      "minimumReleaseAge": "0 days",
-      "schedule": [
-        "at any time"
-      ],
+      "pinDigests": true,
       "automerge": true,
       "automergeType": "pr",
       "addLabels": [
