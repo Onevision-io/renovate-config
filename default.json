@@ -5,13 +5,33 @@
     "config:recommended"
   ],
   "rebaseWhen": "behind-base-branch",
-  "prConcurrentLimit": 3,
+  "timezone": "America/Toronto",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "prConcurrentLimit": 2,
   "prHourlyLimit": 5,
   "minimumReleaseAge": "3 days",
   "platformAutomerge": true,
   "postUpdateOptions": [
     "npmDedupe"
   ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "schedule": [
+      "at any time"
+    ],
+    "minimumReleaseAge": "0 days",
+    "matchUpdateTypes": [
+      "patch"
+    ],
+    "automerge": true,
+    "automergeType": "pr",
+    "labels": [
+      "security",
+      "auto-merge"
+    ]
+  },
   "packageRules": [
     {
       "description": "Never auto-open major bumps org-wide (open manually / review).",
@@ -44,23 +64,16 @@
       "enabled": false
     },
     {
-      "description": "Regular deps: auto-merge patch updates on green CI (low-risk semver). 2026-08-06.",
+      "description": "Renovate-only consolidation (owner decision 2026-09-28): group ALL non-major updates into ONE PR per repo, automerge patch+minor on green CI (platformAutomerge respects required checks -- never bypasses branch protection). digest/lockFileMaintenance ride the same group+label but aren't forced to automerge if not already covered by patch/minor semantics.",
+      "groupName": "all non-major dependencies",
       "matchUpdateTypes": [
-        "patch"
-      ],
-      "automerge": true,
-      "automergeType": "pr",
-      "addLabels": [
-        "auto-merge"
-      ]
-    },
-    {
-      "description": "Regular deps: label auto-merge on minor + digest + lockFileMaintenance updates too (fleet-wide PR-label convention, R-KOS-DEPLOY.must.23).",
-      "matchUpdateTypes": [
+        "patch",
         "minor",
         "digest",
         "lockFileMaintenance"
       ],
+      "automerge": true,
+      "automergeType": "pr",
       "addLabels": [
         "auto-merge"
       ]
