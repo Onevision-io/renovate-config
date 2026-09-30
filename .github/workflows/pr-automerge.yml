@@ -38,7 +38,7 @@ jobs:
   automerge:
     # workflow_run: only proceed on upstream success; other events run + inner filter.
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    uses: Octet-Public/octet-workflows/.github/workflows/pr-automerge.yml@a60c14cb1281d616c27075443aa817b2f9224d00  # v2.17.1
+    uses: Octet-Public/octet-workflows/.github/workflows/pr-automerge.yml@ba21318150a35f714c63376900903d0acd370291  # v2.17.1
     with:
       required_checks: '[]'
       merge_method: squash
